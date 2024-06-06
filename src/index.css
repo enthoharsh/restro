@@ -1,0 +1,15 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.category-name:after {
+    background: none repeat scroll 0 0 black;
+    bottom: -5px;
+    content: "";
+    display: block;
+    height: 1px;
+    position: relative;
+    margin-left: auto;
+    margin-right: auto;
+    width: 50%;
+}
