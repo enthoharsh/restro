@@ -1,5 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { GlobalCart, GlobalProductData } from '../App';
+import MenuItem from '../components/list-products/MenuItem';
+import { Drawer } from 'antd';
+import BottomCartBar from '../components/list-products/BottomCartBar';
 
 const popularSearches = [
   'Packaged Drinking Water Ltr',
@@ -12,12 +16,65 @@ const popularSearches = [
 
 const Search = () => {
   const [searchQuery, setSearchQuery] = useState('');
-
+  const [searchResult, setSearchResult] = useState([])
+  const cart = GlobalCart((state) => state.cart);
+    const setCart = GlobalCart((state) => state.setCart);
+  const data = GlobalProductData((state) => state.data.data);
+  const [open, setOpen] = useState(false);
+  const [drawerProduct, setDrawerProduct] = useState(null)
   const handleSearch = (e) => {
     setSearchQuery(e.target.value);
     // You can add your search logic here
   };
+  const showDrawer = () => {
+    setOpen(true);
+};
 
+const onClose = () => {
+    setOpen(false);
+};
+  useEffect(() => {
+    if (searchQuery === '') {
+        setSearchResult([]);
+    } else {
+        const filteredResults = data.filter(item => 
+            item.name.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+        setSearchResult(filteredResults);
+    }
+}, [searchQuery, data]);
+const onAddProduct = (product) => {
+    setDrawerProduct(product);
+    // showDrawer()
+    if (cart.some((item) => item._id == product._id)) {
+        setCart(
+          cart.map((element) => {
+            if (element._id == product._id) {
+              return {
+                ...element,
+                quantity: element?.quantity + 1,
+              }
+            } else {
+              return element
+            }
+          })
+        )
+      } else {
+        setCart([
+          ...cart,
+          {
+            _id: product._id,
+            name: `${product.name}`,
+            description: product?.description,
+            price: product?.sales_rate,
+            quantity: 1,
+            src: product?.image_urls[0]?.url,
+            meta: product?.meta,
+            parent_meta: product?.parent_meta,
+          },
+        ])
+      }
+}
   return (
     <div className="flex flex-col p-4 h-[100vh]">
       <div className="flex items-center mb-4">
@@ -46,7 +103,7 @@ const Search = () => {
           />
         </div>
       </div>
-      <div className="mb-4">
+      {/* <div className="mb-4">
         <h2 className="text-sm font-semibold mb-2">Popular searches</h2>
         <ul className="flex flex-wrap">
           {popularSearches.map((search, index) => (
@@ -58,8 +115,37 @@ const Search = () => {
             </li>
           ))}
         </ul>
-      </div>
-      <div className=' absolute left-0 bottom-0 w-full p-4'>
+      </div> */}
+      {searchResult.map((item, index) => {
+                    return (
+                        <MenuItem
+                            key={index}
+                            name={item.name}
+                            price={item.mrp_rate}
+                            description={item.description}
+                            customizable={true}
+                            product={item}
+                            onAddProduct={onAddProduct}
+                        />
+                    )
+                })}
+                <Drawer
+                title={drawerProduct?.name}
+                placement={'bottom'}
+                closable={false}
+                onClose={onClose}
+                open={open}
+                key={'bottom'}
+            >
+                <p>Some contents...</p>
+                <p>Some contents...</p>
+                <p>Some contents...</p>
+            </Drawer>
+            {
+                cart.length>=1 &&
+            <BottomCartBar showDrawer={showDrawer}/>
+            }
+      <div className=' sticky left-0 bottom-0 w-full p-4'>
 
         <div onClick={() => {
           window.history.back();
