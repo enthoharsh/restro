@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { GlobalProductData } from '../App';
+import { GlobalCart, GlobalProductData } from '../App';
 import MenuItem from '../components/list-products/MenuItem';
 import { Drawer } from 'antd';
+import BottomCartBar from '../components/list-products/BottomCartBar';
 
 const popularSearches = [
   'Packaged Drinking Water Ltr',
@@ -16,6 +17,8 @@ const popularSearches = [
 const Search = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResult, setSearchResult] = useState([])
+  const cart = GlobalCart((state) => state.cart);
+    const setCart = GlobalCart((state) => state.setCart);
   const data = GlobalProductData((state) => state.data.data);
   const [open, setOpen] = useState(false);
   const [drawerProduct, setDrawerProduct] = useState(null)
@@ -42,7 +45,35 @@ const onClose = () => {
 }, [searchQuery, data]);
 const onAddProduct = (product) => {
     setDrawerProduct(product);
-    showDrawer()
+    // showDrawer()
+    if (cart.some((item) => item._id == product._id)) {
+        setCart(
+          cart.map((element) => {
+            if (element._id == product._id) {
+              return {
+                ...element,
+                quantity: element?.quantity + 1,
+              }
+            } else {
+              return element
+            }
+          })
+        )
+      } else {
+        setCart([
+          ...cart,
+          {
+            _id: product._id,
+            name: `${product.name}`,
+            description: product?.description,
+            price: product?.sales_rate,
+            quantity: 1,
+            src: product?.image_urls[0]?.url,
+            meta: product?.meta,
+            parent_meta: product?.parent_meta,
+          },
+        ])
+      }
 }
   return (
     <div className="flex flex-col p-4 h-[100vh]">
@@ -110,7 +141,11 @@ const onAddProduct = (product) => {
                 <p>Some contents...</p>
                 <p>Some contents...</p>
             </Drawer>
-      <div className=' absolute left-0 bottom-0 w-full p-4'>
+            {
+                cart.length>=1 &&
+            <BottomCartBar showDrawer={showDrawer}/>
+            }
+      <div className=' sticky left-0 bottom-0 w-full p-4'>
 
         <div onClick={() => {
           window.history.back();

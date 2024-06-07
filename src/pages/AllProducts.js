@@ -1,28 +1,14 @@
 import { Drawer } from 'antd';
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom';
 import MenuItem from '../components/list-products/MenuItem';
 import { GlobalCart, GlobalProductData } from '../App';
+import BottomCartBar from '../components/list-products/BottomCartBar';
 
 
 const useQuery = () => {
     return new URLSearchParams(useLocation().search);
 };
-
-const items = [
-    {
-        name: 'Potato fries',
-        price: 295,
-        description: 'Classic / Periperi',
-        customizable: true,
-    },
-    {
-        name: 'Agarwal Chickpeas',
-        price: 225,
-        description: 'Fried crisp, inhouse spice mix, chaat masala',
-        customizable: false,
-    },
-];
 
 const AllProducts = () => {
     const query = useQuery();
@@ -30,6 +16,7 @@ const AllProducts = () => {
     const categoryName = query.get('name');
 
     const data = GlobalProductData((state) => state.data);
+    const [allProducts, setAllProducts] = useState([])
     const cart = GlobalCart((state) => state.cart);
     const setCart = GlobalCart((state) => state.setCart);
 
@@ -52,19 +39,48 @@ const AllProducts = () => {
     const toggleVegOnly = () => {
         setIsVegOnly(!isVegOnly);
     };
-
+    useEffect(() => {
+      setAllProducts(data.data)
+    }, [data])
+    
     const onAddProduct = (product) => {
         setDrawerProduct(product);
-        showDrawer()
+        // showDrawer()
+        if (cart.some((item) => item._id == product._id)) {
+            setCart(
+              cart.map((element) => {
+                if (element._id == product._id) {
+                  return {
+                    ...element,
+                    quantity: element?.quantity + 1,
+                  }
+                } else {
+                  return element
+                }
+              })
+            )
+          } else {
+            setCart([
+              ...cart,
+              {
+                _id: product._id,
+                name: `${product.name}`,
+                description: product?.description,
+                price: product?.sales_rate,
+                quantity: 1,
+                src: product?.image_urls[0]?.url,
+                meta: product?.meta,
+                parent_meta: product?.parent_meta,
+              },
+            ])
+          }
     }
     console.log('data',data.data);
     return (
         <div>
             <div className=" flex items-center justify-between px-4 pt-4 pb-2">
                 <div className="flex items-center">
-                    <div onClick={() => {
-                        window.history.back();
-                    }}>
+                    <Link to={'/'}>
                         <svg
                             className="h-5 w-5 mr-2"
                             fill="none"
@@ -78,7 +94,7 @@ const AllProducts = () => {
                                 d="M10 19l-7-7m0 0l7-7m-7 7h18"
                             />
                         </svg>
-                    </div>
+                    </Link>
                 </div>
                 <div className="flex items-center">
                     <label
@@ -121,7 +137,8 @@ const AllProducts = () => {
             </div>
             <div className="flex overflow-x-auto shadow-md pb-2">
                 {ItemCategories.map((category, index) => (
-                    <span
+                    <Link
+                        to={`/all-products?category=${category._id}&name=${category.name}`}
                         onClick={() => setSelectedCategory(category._id)}
                         style={{ whiteSpace: 'nowrap' }}
                         key={index}
@@ -129,7 +146,7 @@ const AllProducts = () => {
                             }`}
                     >
                         {category.name}
-                    </span>
+                    </Link>
                 ))}
             </div>
             <div className="rounded-md p-6">
@@ -137,7 +154,9 @@ const AllProducts = () => {
 
                     <h2 className="text-md font-bold mb-4 category-name">{categoryName}</h2>
                 </div>
-                {data.data.map((item, index) => {
+                {allProducts.filter(item => 
+            item.item_category_id.toLowerCase().includes(category.toLowerCase())
+        ).map((item, index) => {
                     return (
                         <MenuItem
                             key={index}
@@ -151,6 +170,10 @@ const AllProducts = () => {
                     )
                 })}
             </div>
+            {
+                cart.length>=1 &&
+            <BottomCartBar showDrawer={showDrawer}/>
+            }
             <Drawer
                 title={drawerProduct?.name}
                 placement={'bottom'}

@@ -22,9 +22,17 @@ export const GlobalProductData = create((set, get) => ({
 }))
 
 export const GlobalCart = create((set, get) => ({
-    cart: [],
+    cart: typeof window !== 'undefined' ? (window?.localStorage.getItem('cart') ? JSON.parse(window.localStorage.getItem('cart')):[]) : [],
     setCart: (value) => {
-        set({ cart: value });
+      set((state) => {
+        console.log('state', state);
+        return { ...state, cart: value };
+      });
+      if (typeof window !== 'undefined') {
+        setTimeout(() => {
+          localStorage.setItem('cart', JSON.stringify(get().cart));
+        }, 0);
+      }
     },
     tableId: null,
     setTableId: (value) => {
