@@ -55,7 +55,7 @@ function App() {
                 {
                     headers: {
                         'Content-Type': 'application/json',
-                        'hosturl': 'ikaki.inkapps.io'
+                        'hosturl': 'affy-demo.inkapps.io'
                     }
                 });
             seData(response.data.data);
