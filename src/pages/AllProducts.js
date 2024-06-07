@@ -2,7 +2,7 @@ import { Drawer } from 'antd';
 import React, { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom';
 import MenuItem from '../components/list-products/MenuItem';
-import { GlobalProductData } from '../App';
+import { GlobalCart, GlobalProductData } from '../App';
 
 
 const useQuery = () => {
@@ -30,6 +30,9 @@ const AllProducts = () => {
     const categoryName = query.get('name');
 
     const data = GlobalProductData((state) => state.data);
+    const cart = GlobalCart((state) => state.cart);
+    const setCart = GlobalCart((state) => state.setCart);
+
     const ItemCategories = data.ItemCategories;
 
     const [selectdCategory, setSelectedCategory] = useState(category || ItemCategories[0]._id);
