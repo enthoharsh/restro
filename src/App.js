@@ -2,7 +2,8 @@ import './assets/css/App.css';
 import {
     BrowserRouter as Router,
     Routes,
-    Route
+    Route,
+    useLocation
 } from "react-router-dom";
 
 import { routes } from "./routes";
@@ -18,15 +19,33 @@ export const GlobalProductData = create((set, get) => ({
     seData: (value) => {
         set({ data: value });
     },
+}))
+
+export const GlobalCart = create((set, get) => ({
+    cart: [],
+    setCart: (value) => {
+        set({ cart: value });
+    },
     tableId: null,
     setTableId: (value) => {
         set({ tableId: value });
     },
-}))
+}));
+
+const useQuery = () => {
+    return new URLSearchParams(window.location.search);
+};
 
 function App() {
     const seData = GlobalProductData((state) => state.seData);
+    const setTableId = GlobalCart((state) => state.setTableId);
+
     const intervalRef = React.useRef(null);
+    const query = useQuery();
+
+    if (query.get('tableId')) {
+        setTableId(query.get('tableId'));
+    }
 
     const getProducts = async () => {
         try {
