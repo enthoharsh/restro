@@ -22,6 +22,10 @@ const Home = () => {
                                 <img
                                     src={item.image_url}
                                     alt={item.name}
+                                    style={{
+                                        height: '100%',
+                                        objectFit: 'cover'
+                                    }}
                                 />
                                 <div className="absolute inset-0" style={{ backgroundImage: 'linear-gradient(0deg, #00000087 22%, transparent)' }}></div>
                             </div>

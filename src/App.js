@@ -22,21 +22,27 @@ export const GlobalProductData = create((set, get) => ({
 }))
 
 export const GlobalCart = create((set, get) => ({
-    cart: typeof window !== 'undefined' ? (window?.localStorage.getItem('cart') ? JSON.parse(window.localStorage.getItem('cart')):[]) : [],
+    cart: typeof window !== 'undefined' ? (window?.localStorage.getItem('cart') ? JSON.parse(window.localStorage.getItem('cart')) : []) : [],
     setCart: (value) => {
-      set((state) => {
-        console.log('state', state);
-        return { ...state, cart: value };
-      });
-      if (typeof window !== 'undefined') {
-        setTimeout(() => {
-          localStorage.setItem('cart', JSON.stringify(get().cart));
-        }, 0);
-      }
+        set((state) => {
+            console.log('state', state);
+            return { ...state, cart: value };
+        });
+        if (typeof window !== 'undefined') {
+            setTimeout(() => {
+                localStorage.setItem('cart', JSON.stringify(get().cart));
+            }, 0);
+        }
     },
-    tableId: null,
+    tableId: localStorage.getItem('tableId') || null,
     setTableId: (value) => {
         set({ tableId: value });
+        localStorage.setItem('tableId', value);
+    },
+    tableName: localStorage.getItem('tableName') || null,
+    setTableName: (value) => {
+        set({ tableName: value });
+        localStorage.setItem('tableName', value);
     },
 }));
 
@@ -46,14 +52,11 @@ const useQuery = () => {
 
 function App() {
     const seData = GlobalProductData((state) => state.seData);
+    const tableId = GlobalCart((state) => state.tableId);
     const setTableId = GlobalCart((state) => state.setTableId);
+    const setTableName = GlobalCart((state) => state.setTableName);
 
     const intervalRef = React.useRef(null);
-    const query = useQuery();
-
-    if (query.get('tableId')) {
-        setTableId(query.get('tableId'));
-    }
 
     const getProducts = async () => {
         try {
@@ -71,6 +74,7 @@ function App() {
             console.error(error);
         }
     }
+    const query = useQuery();
 
     useEffect(() => {
         getProducts();
@@ -78,18 +82,37 @@ function App() {
             getProducts();
         }, 50000);
 
+        if (query.get('tableId') && tableId != query.get('tableId')) {
+            setTableId(query.get('tableId'));
+        }
+
+        if (query.get('tableName') && tableId != query.get('tableName')) {
+            setTableName(query.get('tableName'));
+        }
+
         return () => {
             clearInterval(intervalRef.current);
         }
     }, []);
 
-    return (
-        <Router>
-            <Routes>
-                {routes.map(route => <Route {...route} />)}
-            </Routes>
-        </Router>
-    );
+    if (tableId) {
+        return (
+            <Router>
+                <Routes>
+                    {routes.map((route, index) => <Route key={index.toString()} {...route} />)}
+                </Routes>
+            </Router>
+        );
+    }
+
+    return (<>
+        <div className="flex items-center justify-center h-screen">
+            <div className="text-center">
+                <h1 className="text-2xl font-bold">Please scan the QR code available on the table</h1>
+                <p className="text-lg mt-5">If you are unable to scan the QR code, please contact the staff</p>
+            </div>
+        </div>
+    </>);
 }
 
 export default App;

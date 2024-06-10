@@ -40,42 +40,42 @@ const AllProducts = () => {
         setIsVegOnly(!isVegOnly);
     };
     useEffect(() => {
-      setAllProducts(data.data)
+        setAllProducts(data.data)
     }, [data])
-    
+
     const onAddProduct = (product) => {
         setDrawerProduct(product);
         // showDrawer()
         if (cart.some((item) => item._id == product._id)) {
             setCart(
-              cart.map((element) => {
-                if (element._id == product._id) {
-                  return {
-                    ...element,
-                    quantity: element?.quantity + 1,
-                  }
-                } else {
-                  return element
-                }
-              })
+                cart.map((element) => {
+                    if (element._id == product._id) {
+                        return {
+                            ...element,
+                            quantity: element?.quantity + 1,
+                        }
+                    } else {
+                        return element
+                    }
+                })
             )
-          } else {
+        } else {
             setCart([
-              ...cart,
-              {
-                _id: product._id,
-                name: `${product.name}`,
-                description: product?.description,
-                price: product?.sales_rate,
-                quantity: 1,
-                src: product?.image_urls[0]?.url,
-                meta: product?.meta,
-                parent_meta: product?.parent_meta,
-              },
+                ...cart,
+                {
+                    _id: product._id,
+                    name: `${product.name}`,
+                    description: product?.description,
+                    price: product?.sales_rate,
+                    quantity: 1,
+                    src: product.image_urls && product.image_urls.length > 0 ? product?.image_urls[0]?.url : '',
+                    meta: product?.meta,
+                    parent_meta: product?.parent_meta,
+                },
             ])
-          }
+        }
     }
-    console.log('data',data.data);
+    console.log('data', data.data);
     return (
         <div>
             <div className=" flex items-center justify-between px-4 pt-4 pb-2">
@@ -97,7 +97,7 @@ const AllProducts = () => {
                     </Link>
                 </div>
                 <div className="flex items-center">
-                    <label
+                    {/* <label
                         htmlFor="veg-only"
                         className="mr-2 text-sm font-semibold tracking-wide"
                     >
@@ -115,7 +115,7 @@ const AllProducts = () => {
                             className={`absolute w-4 h-4 rounded-full transition-transform duration-300 ${isVegOnly ? 'translate-x-5 bg-green-800' : 'translate-x-0 bg-black'
                                 }`}
                         />
-                    </div>
+                    </div> */}
                 </div>
                 <div className="flex items-center">
                     <Link to={`/search`} className="relative">
@@ -154,14 +154,14 @@ const AllProducts = () => {
 
                     <h2 className="text-md font-bold mb-4 category-name">{categoryName}</h2>
                 </div>
-                {allProducts.filter(item => 
-            item.item_category_id.toLowerCase().includes(category.toLowerCase())
-        ).map((item, index) => {
+                {allProducts.filter(item =>
+                    item.item_category_id.toLowerCase().includes(category.toLowerCase())
+                ).map((item, index) => {
                     return (
                         <MenuItem
                             key={index}
                             name={item.name}
-                            price={item.mrp_rate}
+                            price={item.sales_rate}
                             description={item.description}
                             customizable={true}
                             product={item}
@@ -171,21 +171,9 @@ const AllProducts = () => {
                 })}
             </div>
             {
-                cart.length>=1 &&
-            <BottomCartBar showDrawer={showDrawer}/>
+                cart.length >= 1 &&
+                <BottomCartBar showDrawer={showDrawer} />
             }
-            <Drawer
-                title={drawerProduct?.name}
-                placement={'bottom'}
-                closable={false}
-                onClose={onClose}
-                open={open}
-                key={'bottom'}
-            >
-                <p>Some contents...</p>
-                <p>Some contents...</p>
-                <p>Some contents...</p>
-            </Drawer>
         </div>
     )
 }

@@ -18,7 +18,7 @@ const Search = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResult, setSearchResult] = useState([])
   const cart = GlobalCart((state) => state.cart);
-    const setCart = GlobalCart((state) => state.setCart);
+  const setCart = GlobalCart((state) => state.setCart);
   const data = GlobalProductData((state) => state.data.data);
   const [open, setOpen] = useState(false);
   const [drawerProduct, setDrawerProduct] = useState(null)
@@ -28,53 +28,53 @@ const Search = () => {
   };
   const showDrawer = () => {
     setOpen(true);
-};
+  };
 
-const onClose = () => {
+  const onClose = () => {
     setOpen(false);
-};
+  };
   useEffect(() => {
     if (searchQuery === '') {
-        setSearchResult([]);
+      setSearchResult([]);
     } else {
-        const filteredResults = data.filter(item => 
-            item.name.toLowerCase().includes(searchQuery.toLowerCase())
-        );
-        setSearchResult(filteredResults);
+      const filteredResults = data.filter(item =>
+        item.name.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      setSearchResult(filteredResults);
     }
-}, [searchQuery, data]);
-const onAddProduct = (product) => {
+  }, [searchQuery, data]);
+  const onAddProduct = (product) => {
     setDrawerProduct(product);
     // showDrawer()
     if (cart.some((item) => item._id == product._id)) {
-        setCart(
-          cart.map((element) => {
-            if (element._id == product._id) {
-              return {
-                ...element,
-                quantity: element?.quantity + 1,
-              }
-            } else {
-              return element
+      setCart(
+        cart.map((element) => {
+          if (element._id == product._id) {
+            return {
+              ...element,
+              quantity: element?.quantity + 1,
             }
-          })
-        )
-      } else {
-        setCart([
-          ...cart,
-          {
-            _id: product._id,
-            name: `${product.name}`,
-            description: product?.description,
-            price: product?.sales_rate,
-            quantity: 1,
-            src: product?.image_urls[0]?.url,
-            meta: product?.meta,
-            parent_meta: product?.parent_meta,
-          },
-        ])
-      }
-}
+          } else {
+            return element
+          }
+        })
+      )
+    } else {
+      setCart([
+        ...cart,
+        {
+          _id: product._id,
+          name: `${product.name}`,
+          description: product?.description,
+          price: product?.sales_rate,
+          quantity: 1,
+          src: product.image_urls && product.image_urls.length > 0 ? product?.image_urls[0]?.url : '',
+          meta: product?.meta,
+          parent_meta: product?.parent_meta,
+        },
+      ])
+    }
+  }
   return (
     <div className="flex flex-col p-4 h-[100vh]">
       <div className="flex items-center mb-4">
@@ -117,34 +117,23 @@ const onAddProduct = (product) => {
         </ul>
       </div> */}
       {searchResult.map((item, index) => {
-                    return (
-                        <MenuItem
-                            key={index}
-                            name={item.name}
-                            price={item.mrp_rate}
-                            description={item.description}
-                            customizable={true}
-                            product={item}
-                            onAddProduct={onAddProduct}
-                        />
-                    )
-                })}
-                <Drawer
-                title={drawerProduct?.name}
-                placement={'bottom'}
-                closable={false}
-                onClose={onClose}
-                open={open}
-                key={'bottom'}
-            >
-                <p>Some contents...</p>
-                <p>Some contents...</p>
-                <p>Some contents...</p>
-            </Drawer>
-            {
-                cart.length>=1 &&
-            <BottomCartBar showDrawer={showDrawer}/>
-            }
+        return (
+          <MenuItem
+            key={index}
+            name={item.name}
+            price={item.mrp_rate}
+            description={item.description}
+            customizable={true}
+            product={item}
+            onAddProduct={onAddProduct}
+          />
+        )
+      })}
+
+      {
+        cart.length >= 1 &&
+        <BottomCartBar showDrawer={showDrawer} />
+      }
       <div className=' sticky left-0 bottom-0 w-full p-4'>
 
         <div onClick={() => {

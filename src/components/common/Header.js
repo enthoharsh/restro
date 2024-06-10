@@ -1,11 +1,15 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-const Header = () => {
-    const navigate = useNavigate();
+import { GlobalCart } from '../../App';
 
-    const handleSearchClick = () => {
-        navigate('/search')
-    };
+const Header = () => {
+  const tableName = GlobalCart((state) => state.tableName);
+
+  const navigate = useNavigate();
+
+  const handleSearchClick = () => {
+    navigate('/search')
+  };
 
   return (
     <header className="bg-white shadow-md sticky top-0 z-10">
@@ -29,7 +33,7 @@ const Header = () => {
               </svg>
             </button>
           </div>
-          <div className="text-gray-700 font-semibold">Table No: 01</div>
+          <div className="text-gray-700 font-semibold">Table No: {tableName}</div>
         </div>
       </div>
       <div className="shadow-sm"></div>
