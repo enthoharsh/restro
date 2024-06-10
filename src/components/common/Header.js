@@ -1,9 +1,11 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GlobalCart } from '../../App';
+import { PhoneOutlined } from '@ant-design/icons';
 
 const Header = () => {
   const tableName = GlobalCart((state) => state.tableName);
+  const SupportNumber = GlobalCart((state) => state.SupportNumber);
 
   const navigate = useNavigate();
 
@@ -33,6 +35,9 @@ const Header = () => {
               </svg>
             </button>
           </div>
+          <a href={`tel:${SupportNumber}`} className='ml-auto mr-2'>
+          <PhoneOutlined /> Call & Support
+          </a>
           <div className="text-gray-700 font-semibold">Table No: {tableName}</div>
         </div>
       </div>

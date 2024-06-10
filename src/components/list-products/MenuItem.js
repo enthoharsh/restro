@@ -7,6 +7,7 @@ const MenuItem = ({ name, price, description, customizable, onAddProduct, produc
   const [isInclude, setIsInclude] = useState(
     cart.some((item) => (item._id == product?._id && item.quantity >= 1)) ? true : false
   )
+  const prod =cart.filter((item) => (item._id == product?._id))[0]
   const handleQuantityChange = (id, action) => {
     setCart(
       cart.map((product) =>
@@ -43,6 +44,7 @@ const MenuItem = ({ name, price, description, customizable, onAddProduct, produc
         {
           (cart.some((item) => (item._id == product?._id && item.quantity >= 1)) ? true : false) ? <div className='flex items-center mt-2'>
             <button
+              disabled={prod?.isEditable && (prod?.old_qty >= prod?.quantity)}
               className="rounded-full bg-gray-200 p-2"
               onClick={() => handleQuantity('subtract')}
               style={{
@@ -50,7 +52,8 @@ const MenuItem = ({ name, price, description, customizable, onAddProduct, produc
                 alignItems: 'center',
                 justifyContent: 'center',
                 height: '24px',
-                width: '24px'
+                width: '24px',
+                opacity:(prod?.isEditable && (prod?.old_qty >= prod?.quantity))?'0.3':1
               }}
             >
               <svg
@@ -65,7 +68,9 @@ const MenuItem = ({ name, price, description, customizable, onAddProduct, produc
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
               </svg>
             </button>
-            <span className="mx-2">{cart.filter((elem) => elem._id == product._id)[0]?.quantity}</span>
+            <span style={{
+              opacity:(prod?.isEditable && (prod?.old_qty >= prod?.quantity))?'0.4':1
+            }} className="mx-2">{cart.filter((elem) => elem._id == product._id)[0]?.quantity}</span>
             <button
               className="rounded-full bg-gray-200 p-2"
               onClick={() => handleQuantity('add')}
@@ -74,7 +79,7 @@ const MenuItem = ({ name, price, description, customizable, onAddProduct, produc
                 alignItems: 'center',
                 justifyContent: 'center',
                 height: '24px',
-                width: '24px'
+                width: '24px',
               }}
             >
               <svg

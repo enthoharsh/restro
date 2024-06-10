@@ -55,8 +55,9 @@ const BottomCartBar = ({ }) => {
   const moduleName = 'Invoices';
   const tableId = GlobalCart((state) => state.tableId);
   const setCart = GlobalCart((state) => state.setCart);
+  const orderId = GlobalCart((state) => state.orderId);
   const params = {}
-
+  console.log('orderId',orderId);
   const navigate = useNavigate();
 
   const getModuleCreateData = async (values = null) => {
@@ -149,6 +150,7 @@ const BottomCartBar = ({ }) => {
     };
 
     body.invoice_details.table_id = tableId;
+    body.invoice_details.invoice_id = orderId;
     body.invoice_details.status = "On Hold";
 
     axios.post("https://accounting-new.inkapps.io/api/shop/placeOrder", body, {

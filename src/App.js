@@ -34,6 +34,18 @@ export const GlobalCart = create((set, get) => ({
             }, 0);
         }
     },
+    SupportNumber:'',
+    setSupportNumber:(value)=>{
+        set((state)=>{
+            return{...state,SupportNumber:value}
+        })
+    },
+    orderId:'',
+    setOrderId:(value)=>{
+        set((state)=>{
+            return{...state,orderId:value}
+        })
+    },
     tableId: localStorage.getItem('tableId') || null,
     setTableId: (value) => {
         set({ tableId: value });
@@ -52,9 +64,13 @@ const useQuery = () => {
 
 function App() {
     const seData = GlobalProductData((state) => state.seData);
+    const setSupportNumber = GlobalCart((state) => state.setSupportNumber);
     const tableId = GlobalCart((state) => state.tableId);
     const setTableId = GlobalCart((state) => state.setTableId);
     const setTableName = GlobalCart((state) => state.setTableName);
+    const setCart = GlobalCart((state) => state.setCart);
+    const setOrderId = GlobalCart((state) => state.setOrderId);
+    const cart = GlobalCart((state) => state.cart);
 
     const intervalRef = React.useRef(null);
     const getOrders = async () => {
@@ -68,7 +84,23 @@ function App() {
                         'hosturl': 'affy-demo.inkapps.io'
                     }
                 });
-            console.log(response.data.data);
+                setOrderId(response?.data?.order?._id)
+                setSupportNumber(response?.data?.data?.phone)
+                setCart([...response.data.order.line_items.map((elm,i)=>{
+                    return {
+                        _id: elm.item._id,
+                        name: `${elm.item.name}`,
+                        description: elm.item.description,
+                        price: elm.item_price,
+                        old_qty:elm.quantity,
+                        quantity: elm.quantity,
+                        src: elm.item.image_urls && elm.item.image_urls.length > 0 ? elm.item.image_urls[0]?.url : '',
+                        isEditable:elm.kot_status=='Pending'?false:true
+                        // meta: product?.meta,
+                        // parent_meta: product?.parent_meta,
+                    }
+                })])
+                // console.log(response.data.order);
         } catch (error) {
             console.error(error);
         }

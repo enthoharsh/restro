@@ -4,6 +4,7 @@ import { Link, useLocation } from 'react-router-dom';
 import MenuItem from '../components/list-products/MenuItem';
 import { GlobalCart, GlobalProductData } from '../App';
 import BottomCartBar from '../components/list-products/BottomCartBar';
+import { PhoneOutlined } from '@ant-design/icons';
 
 
 const useQuery = () => {
@@ -19,6 +20,7 @@ const AllProducts = () => {
     const [allProducts, setAllProducts] = useState([])
     const cart = GlobalCart((state) => state.cart);
     const setCart = GlobalCart((state) => state.setCart);
+    const SupportNumber = GlobalCart((state) => state.SupportNumber);
 
     const ItemCategories = data.ItemCategories;
 
@@ -116,6 +118,9 @@ const AllProducts = () => {
                                 }`}
                         />
                     </div> */}
+                     <a href={`tel:${SupportNumber}`} className='ml-auto mr-2'>
+          <PhoneOutlined /> Call & Support
+          </a>
                 </div>
                 <div className="flex items-center">
                     <Link to={`/search`} className="relative">
