@@ -57,7 +57,22 @@ function App() {
     const setTableName = GlobalCart((state) => state.setTableName);
 
     const intervalRef = React.useRef(null);
-
+    const getOrders = async () => {
+        try {
+            const response = await axios.post(
+                'https://accounting-new.inkapps.io/api/shop/getTableDetailsWithOrder',
+                { "search": "", "minPrice": "", "maxPrice": "", "page": 1, "perPage": 100000, "meta": {},"table_id":"6662c30f72eee8389a3d8ce5" },
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'hosturl': 'affy-demo.inkapps.io'
+                    }
+                });
+            console.log(response.data.data);
+        } catch (error) {
+            console.error(error);
+        }
+    }
     const getProducts = async () => {
         try {
             const response = await axios.post(
@@ -78,6 +93,7 @@ function App() {
 
     useEffect(() => {
         getProducts();
+        getOrders();
         intervalRef.current = setInterval(() => {
             getProducts();
         }, 50000);
