@@ -160,7 +160,7 @@ const AllProducts = () => {
                     <h2 className="text-md font-bold mb-4 category-name">{categoryName}</h2>
                 </div>
                 {allProducts.filter(item =>
-                    item.item_category_id.toLowerCase().includes(category.toLowerCase())
+                    item?.item_category_id?.toLowerCase().includes(category?.toLowerCase())
                 ).map((item, index) => {
                     return (
                         <MenuItem
