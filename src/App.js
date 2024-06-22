@@ -85,6 +85,10 @@ function App() {
                     }
                 });
             setOrderId(response?.data?.order?._id)
+            if (response?.data?.order == null) {
+                console.log("clear cart");
+                setCart([])
+            }
             setSupportNumber(response?.data?.data?.phone)
             setCart([...response.data.order.line_items.map((elm, i) => {
                 return {
@@ -127,6 +131,7 @@ function App() {
         getProducts();
         getOrders();
         intervalRef.current = setInterval(() => {
+            getOrders();
             getProducts();
         }, 50000);
 

@@ -114,14 +114,16 @@ const BottomCartBar = ({ }) => {
   }
 
   const placeOrder = async () => {
-    if (!name) {
-      messageApi.error("Please enter your name!")
-      return
-    }
-
-    if (!phone) {
-      messageApi.error("Please enter your phone number!")
-      return
+    if (!orderId) {
+      if (!name) {
+        messageApi.error("Please enter your name!")
+        return
+      }
+  
+      if (!phone) {
+        messageApi.error("Please enter your phone number!")
+        return
+      }
     }
 
     await getUser();
@@ -162,7 +164,7 @@ const BottomCartBar = ({ }) => {
       console.log('res', res);
       messageApi.success("Order placed successfully!")
       // window.location.href = '/thank-you';
-      setCart([])
+      // setCart([])
       navigate('/thank-you')
     }).catch((err) => {
       console.log('err', err);
@@ -249,7 +251,7 @@ const BottomCartBar = ({ }) => {
       key={'bottom'}
     >
       {/* Take name and phone number and then place the order */}
-      <div className="flex flex-col gap-4">
+      {!orderId &&<div className="flex flex-col gap-4">
         <Input placeholder="Name" onChange={(e) => {
           setName(e.target.value)
         }} />
@@ -262,11 +264,35 @@ const BottomCartBar = ({ }) => {
         <button className="bg-black text-white px-4 py-2" onClick={() => {
           placeOrder();
         }}>Place Order</button>
-      </div>
+      </div>}
+      {
+        orderId && <>
+        <div>
+        Are you sure to add this item ?
+
+        </div>
+        <div className='flex justify-center gap-4 mt-3'>
+
+        <button className="bg-white text-black px-4 py-2 border" onClick={() => {
+          setOpen(false);
+        }}>Cancel</button>
+        <button className="bg-black text-white px-4 py-2" onClick={() => {
+          placeOrder();
+        }}>Place Order</button>
+        </div>
+        </>
+      }
     </Drawer>
 
-    <div className="fixed bottom-0 left-0 right-0 bg-black text-white px-4 py-2" onClick={() => {
-      setOpen(true)
+    <div className="fixed bottom-0 left-0 right-0 text-white px-4 py-2"
+    style={{
+      background:cart.every(item => item.hasOwnProperty('old_qty'))?'gray':'black'
+    }} onClick={() => {
+      if (cart.every(item => item.hasOwnProperty('old_qty'))) {
+        console.log('add new product first');
+      } else {
+        setOpen(true)
+      }
     }}>
       <div className="flex items-center justify-between">
         <div className='flex gap-4'>
@@ -282,7 +308,7 @@ const BottomCartBar = ({ }) => {
           </div>
           <span>₹{totalPrice}</span>
         </div>
-        <button className="bg-transparent text-white px-4 py-2 ">VIEW CART →</button>
+        <button className="bg-transparent text-white px-4 py-2 " >CHECKOUT →</button>
       </div>
     </div>
   </>
