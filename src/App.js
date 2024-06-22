@@ -34,16 +34,16 @@ export const GlobalCart = create((set, get) => ({
             }, 0);
         }
     },
-    SupportNumber:'',
-    setSupportNumber:(value)=>{
-        set((state)=>{
-            return{...state,SupportNumber:value}
+    SupportNumber: '',
+    setSupportNumber: (value) => {
+        set((state) => {
+            return { ...state, SupportNumber: value }
         })
     },
-    orderId:'',
-    setOrderId:(value)=>{
-        set((state)=>{
-            return{...state,orderId:value}
+    orderId: '',
+    setOrderId: (value) => {
+        set((state) => {
+            return { ...state, orderId: value }
         })
     },
     tableId: localStorage.getItem('tableId') || null,
@@ -77,30 +77,30 @@ function App() {
         try {
             const response = await axios.post(
                 'https://accounting-new.inkapps.io/api/shop/getTableDetailsWithOrder',
-                { "search": "", "minPrice": "", "maxPrice": "", "page": 1, "perPage": 100000, "meta": {},"table_id":"6662c30f72eee8389a3d8ce5" },
+                { "search": "", "minPrice": "", "maxPrice": "", "page": 1, "perPage": 100000, "meta": {}, "table_id": tableId },
                 {
                     headers: {
                         'Content-Type': 'application/json',
                         'hosturl': 'affy-demo.inkapps.io'
                     }
                 });
-                setOrderId(response?.data?.order?._id)
-                setSupportNumber(response?.data?.data?.phone)
-                setCart([...response.data.order.line_items.map((elm,i)=>{
-                    return {
-                        _id: elm.item._id,
-                        name: `${elm.item.name}`,
-                        description: elm.item.description,
-                        price: elm.item_price,
-                        old_qty:elm.quantity,
-                        quantity: elm.quantity,
-                        src: elm.item.image_urls && elm.item.image_urls.length > 0 ? elm.item.image_urls[0]?.url : '',
-                        isEditable:elm.kot_status=='Pending'?false:true
-                        // meta: product?.meta,
-                        // parent_meta: product?.parent_meta,
-                    }
-                })])
-                // console.log(response.data.order);
+            setOrderId(response?.data?.order?._id)
+            setSupportNumber(response?.data?.data?.phone)
+            setCart([...response.data.order.line_items.map((elm, i) => {
+                return {
+                    _id: elm.item._id,
+                    name: `${elm.item.name}`,
+                    description: elm.item.description,
+                    price: elm.item_price,
+                    old_qty: elm.quantity,
+                    quantity: elm.quantity,
+                    src: elm.item.image_urls && elm.item.image_urls.length > 0 ? elm.item.image_urls[0]?.url : '',
+                    isEditable: elm.kot_status == 'Pending' ? false : true
+                    // meta: product?.meta,
+                    // parent_meta: product?.parent_meta,
+                }
+            })])
+            // console.log(response.data.order);
         } catch (error) {
             console.error(error);
         }
