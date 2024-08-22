@@ -44,7 +44,7 @@ const MenuItem = ({ name, price, description, customizable, onAddProduct, produc
         {
           (cart.some((item) => (item._id == product?._id && item.quantity >= 1)) ? true : false) ? <div className='flex items-center mt-2'>
             <button
-              disabled={prod?.kot_sent_quantity <= prod?.quantity}
+              disabled={prod?.kot_sent_quantity >= prod?.quantity}
               className="rounded-full bg-gray-200 p-2"
               onClick={() => handleQuantity('subtract')}
               style={{
@@ -53,7 +53,7 @@ const MenuItem = ({ name, price, description, customizable, onAddProduct, produc
                 justifyContent: 'center',
                 height: '24px',
                 width: '24px',
-                opacity: (prod?.kot_sent_quantity <= prod?.quantity) ? '0.3' : 1
+                opacity: (prod?.kot_sent_quantity >= prod?.quantity) ? '0.3' : 1
               }}
             >
               <svg
@@ -69,7 +69,7 @@ const MenuItem = ({ name, price, description, customizable, onAddProduct, produc
               </svg>
             </button>
             <span style={{
-              opacity: (prod?.kot_sent_quantity <= prod?.quantity) ? ' 0.4' : 1
+              opacity: (prod?.kot_sent_quantity >= prod?.quantity) ? ' 0.4' : 1
             }} className="mx-2">{cart.filter((elem) => elem._id == product._id)[0]?.quantity}</span>
             <button
               className="rounded-full bg-gray-200 p-2"

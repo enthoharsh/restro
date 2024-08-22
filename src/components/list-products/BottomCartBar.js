@@ -242,7 +242,6 @@ const BottomCartBar = ({ }) => {
       open={open}
       key={'bottom'}
     >
-      {/* Take name and phone number and then place the order */}
       {!orderId && <div className="flex flex-col gap-4">
         <Input placeholder="Name" onChange={(e) => {
           setName(e.target.value)
@@ -259,11 +258,15 @@ const BottomCartBar = ({ }) => {
       </div>}
       {orderId && <>
         <div>
-          Are you sure to add this item ?
-
+          Order Summary:-
         </div>
+        {cart.map((product) => {
+          return <div className='flex justify-between'>
+            <span>{product.name}</span>
+            <span>{product.quantity}</span>
+          </div>
+        })}
         <div className='flex justify-center gap-4 mt-3'>
-
           <button className="bg-white text-black px-4 py-2 border" onClick={() => {
             setOpen(false);
           }}>Cancel</button>
@@ -277,13 +280,9 @@ const BottomCartBar = ({ }) => {
 
     <div className="fixed bottom-0 left-0 right-0 text-white px-4 py-2"
       style={{
-        background: cart.every(item => item.hasOwnProperty('old_qty')) ? 'gray' : 'black'
+        background: 'black'
       }} onClick={() => {
-        if (cart.every(item => item.hasOwnProperty('old_qty'))) {
-          console.log('add new product first');
-        } else {
-          setOpen(true)
-        }
+        setOpen(true)
       }}>
       <div className="flex items-center justify-between">
         <div className='flex gap-4'>

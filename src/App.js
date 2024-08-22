@@ -139,11 +139,16 @@ function App() {
         channel.subscribe('update', (message) => {
             getOrders();
         });
+
+        getOrders();
+
+        return () => {
+            channel.unsubscribe();
+        }
     }, [tableId]);
 
     useEffect(() => {
         getProducts();
-        getOrders();
 
         if (query.get('tableId') && tableId != query.get('tableId')) {
             setTableId(query.get('tableId'));
