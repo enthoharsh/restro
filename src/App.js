@@ -10,6 +10,7 @@ import { routes } from "./routes";
 import { create } from 'zustand';
 import React, { useEffect } from 'react';
 import axios from 'axios';
+import { Realtime } from 'ably';
 
 export const GlobalProductData = create((set, get) => ({
     data: {
@@ -73,6 +74,7 @@ function App() {
     const cart = GlobalCart((state) => state.cart);
 
     const intervalRef = React.useRef(null);
+
     const getOrders = async () => {
         try {
             const response = await axios.post(
@@ -81,34 +83,36 @@ function App() {
                 {
                     headers: {
                         'Content-Type': 'application/json',
-                        'hosturl': 'affy-demo.inkapps.io'
+                        'hosturl': 'jamee.inkapps.io'
                     }
                 });
+
             setOrderId(response?.data?.order?._id)
-            if (response?.data?.order == null) {
-                console.log("clear cart");
-                setCart([])
-            }
             setSupportNumber(response?.data?.data?.phone)
-            setCart([...response.data.order.line_items.map((elm, i) => {
-                return {
-                    _id: elm.item._id,
-                    name: `${elm.item.name}`,
-                    description: elm.item.description,
-                    price: elm.item_price,
-                    old_qty: elm.quantity,
-                    quantity: elm.quantity,
-                    src: elm.item.image_urls && elm.item.image_urls.length > 0 ? elm.item.image_urls[0]?.url : '',
-                    isEditable: elm.kot_status == 'Pending' ? false : true
-                    // meta: product?.meta,
-                    // parent_meta: product?.parent_meta,
-                }
-            })])
+
+            if (response?.data?.order == null) {
+                setCart([])
+            } else {
+                setCart([...response.data.order.line_items.map((elm, i) => {
+                    return {
+                        _id: elm.item._id,
+                        name: `${elm.item.name}`,
+                        description: elm.item.description,
+                        price: elm.item_price,
+                        old_qty: elm.quantity,
+                        quantity: elm.quantity,
+                        kot_sent_quantity: elm.kot_sent_quantity,
+                        src: elm.item.image_urls && elm.item.image_urls.length > 0 ? elm.item.image_urls[0]?.url : '',
+                    }
+                })])
+            }
+
             // console.log(response.data.order);
         } catch (error) {
             console.error(error);
         }
     }
+
     const getProducts = async () => {
         try {
             const response = await axios.post(
@@ -117,7 +121,7 @@ function App() {
                 {
                     headers: {
                         'Content-Type': 'application/json',
-                        'hosturl': 'affy-demo.inkapps.io'
+                        'hosturl': 'jamee.inkapps.io'
                     }
                 });
             seData(response.data.data);
@@ -125,15 +129,21 @@ function App() {
             console.error(error);
         }
     }
+
     const query = useQuery();
+
+    useEffect(() => {
+        const ably = new Realtime({ key: 'x9wJ8g.bezGYQ:d2wpDTn_w_8xkNUbKz2pQcrB-DHPmaRv4ml5zMuuNzs' });
+        const channel = ably.channels.get('table-' + tableId);
+
+        channel.subscribe('update', (message) => {
+            getOrders();
+        });
+    }, [tableId]);
 
     useEffect(() => {
         getProducts();
         getOrders();
-        intervalRef.current = setInterval(() => {
-            getOrders();
-            getProducts();
-        }, 50000);
 
         if (query.get('tableId') && tableId != query.get('tableId')) {
             setTableId(query.get('tableId'));

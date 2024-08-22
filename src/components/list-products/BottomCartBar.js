@@ -57,7 +57,7 @@ const BottomCartBar = ({ }) => {
   const setCart = GlobalCart((state) => state.setCart);
   const orderId = GlobalCart((state) => state.orderId);
   const params = {}
-  console.log('orderId',orderId);
+  console.log('orderId', orderId);
   const navigate = useNavigate();
 
   const getModuleCreateData = async (values = null) => {
@@ -66,7 +66,7 @@ const BottomCartBar = ({ }) => {
     }, {
       headers: {
         'Content-Type': 'application/json',
-        'hosturl': 'affy-demo.inkapps.io'
+        'hosturl': 'jamee.inkapps.io'
       },
     });
 
@@ -106,7 +106,7 @@ const BottomCartBar = ({ }) => {
     }, {
       headers: {
         'Content-Type': 'application/json',
-        'hosturl': 'affy-demo.inkapps.io'
+        'hosturl': 'jamee.inkapps.io'
       },
     });
 
@@ -119,7 +119,7 @@ const BottomCartBar = ({ }) => {
         messageApi.error("Please enter your name!")
         return
       }
-  
+
       if (!phone) {
         messageApi.error("Please enter your phone number!")
         return
@@ -153,12 +153,16 @@ const BottomCartBar = ({ }) => {
 
     body.invoice_details.table_id = tableId;
     body.invoice_details.invoice_id = orderId;
-    body.invoice_details.status = "On Hold";
+    body.invoice_details.status = "Pending";
+
+    console.log('body', body);
+
+    updateFormObject();
 
     axios.post("https://accounting-new.inkapps.io/api/shop/placeOrder", body, {
       headers: {
         'Content-Type': 'application/json',
-        'hosturl': 'affy-demo.inkapps.io'
+        'hosturl': 'jamee.inkapps.io'
       },
     }).then((res) => {
       console.log('res', res);
@@ -174,18 +178,6 @@ const BottomCartBar = ({ }) => {
 
   useEffect(() => {
     getModuleCreateData({ disable_auto_line_item: true });
-    // getUser().then((res) => {
-    //   console.log('res', res);
-    //   setName(res.name)
-    //   setPhone(res.phone.slice(3))
-    //   setEmail(res.email)
-    //   setCity(res.addresses[0].city)
-    //   setState(res.addresses[0].state)
-    //   setPincode(res.addresses[0].pincode)
-    //   setAddress(res.addresses[0].address_line_1)
-    //   setApartment(res.addresses[0].address_line_2)
-    //   setProfileData(res)
-    // })
   }, []);
 
   const updateFormObject = () => {
@@ -251,7 +243,7 @@ const BottomCartBar = ({ }) => {
       key={'bottom'}
     >
       {/* Take name and phone number and then place the order */}
-      {!orderId &&<div className="flex flex-col gap-4">
+      {!orderId && <div className="flex flex-col gap-4">
         <Input placeholder="Name" onChange={(e) => {
           setName(e.target.value)
         }} />
@@ -265,35 +257,34 @@ const BottomCartBar = ({ }) => {
           placeOrder();
         }}>Place Order</button>
       </div>}
-      {
-        orderId && <>
+      {orderId && <>
         <div>
-        Are you sure to add this item ?
+          Are you sure to add this item ?
 
         </div>
         <div className='flex justify-center gap-4 mt-3'>
 
-        <button className="bg-white text-black px-4 py-2 border" onClick={() => {
-          setOpen(false);
-        }}>Cancel</button>
-        <button className="bg-black text-white px-4 py-2" onClick={() => {
-          placeOrder();
-        }}>Place Order</button>
+          <button className="bg-white text-black px-4 py-2 border" onClick={() => {
+            setOpen(false);
+          }}>Cancel</button>
+          <button className="bg-black text-white px-4 py-2" onClick={() => {
+            placeOrder();
+          }}>Place Order</button>
         </div>
-        </>
+      </>
       }
     </Drawer>
 
     <div className="fixed bottom-0 left-0 right-0 text-white px-4 py-2"
-    style={{
-      background:cart.every(item => item.hasOwnProperty('old_qty'))?'gray':'black'
-    }} onClick={() => {
-      if (cart.every(item => item.hasOwnProperty('old_qty'))) {
-        console.log('add new product first');
-      } else {
-        setOpen(true)
-      }
-    }}>
+      style={{
+        background: cart.every(item => item.hasOwnProperty('old_qty')) ? 'gray' : 'black'
+      }} onClick={() => {
+        if (cart.every(item => item.hasOwnProperty('old_qty'))) {
+          console.log('add new product first');
+        } else {
+          setOpen(true)
+        }
+      }}>
       <div className="flex items-center justify-between">
         <div className='flex gap-4'>
 
