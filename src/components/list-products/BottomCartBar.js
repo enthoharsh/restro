@@ -54,6 +54,7 @@ const BottomCartBar = ({ }) => {
   const setFormObject = useFormObject((state) => state.setFormObject);
   const moduleName = 'Invoices';
   const tableId = GlobalCart((state) => state.tableId);
+  const orgId = GlobalCart((state) => state.orgId);
   const setCart = GlobalCart((state) => state.setCart);
   const orderId = GlobalCart((state) => state.orderId);
   const params = {}
@@ -66,7 +67,8 @@ const BottomCartBar = ({ }) => {
     }, {
       headers: {
         'Content-Type': 'application/json',
-        'hosturl': 'jamee.inkapps.io'
+        'hosturl': 'jamee.inkapps.io',
+        'orgid': orgId
       },
     });
 
@@ -106,7 +108,8 @@ const BottomCartBar = ({ }) => {
     }, {
       headers: {
         'Content-Type': 'application/json',
-        'hosturl': 'jamee.inkapps.io'
+        'hosturl': 'jamee.inkapps.io',
+        'orgid': orgId
       },
     });
 
@@ -162,7 +165,8 @@ const BottomCartBar = ({ }) => {
     axios.post("https://accounting-new.inkapps.io/api/shop/placeOrder", body, {
       headers: {
         'Content-Type': 'application/json',
-        'hosturl': 'jamee.inkapps.io'
+        'hosturl': 'jamee.inkapps.io',
+        'orgid': orgId
       },
     }).then((res) => {
       console.log('res', res);

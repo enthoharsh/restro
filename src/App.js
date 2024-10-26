@@ -57,6 +57,16 @@ export const GlobalCart = create((set, get) => ({
         set({ tableName: value });
         localStorage.setItem('tableName', value);
     },
+    orgId: localStorage.getItem('orgId') || null,
+    setOrgId: (value) => {
+        set({ orgId: value });
+        localStorage.setItem('orgId', value);
+    },
+    sessionExpiryDate: localStorage.getItem('sessionExpiryDate') || null,
+    setSessionExpiryDate: (value) => {
+        set({ sessionExpiryDate: value });
+        localStorage.setItem('sessionExpiryDate', value);
+    },
 }));
 
 const useQuery = () => {
@@ -67,15 +77,23 @@ function App() {
     const seData = GlobalProductData((state) => state.seData);
     const setSupportNumber = GlobalCart((state) => state.setSupportNumber);
     const tableId = GlobalCart((state) => state.tableId);
+    const orgId = GlobalCart((state) => state.orgId);
+    const setOrgId = GlobalCart((state) => state.setOrgId);
     const setTableId = GlobalCart((state) => state.setTableId);
     const setTableName = GlobalCart((state) => state.setTableName);
     const setCart = GlobalCart((state) => state.setCart);
     const setOrderId = GlobalCart((state) => state.setOrderId);
     const cart = GlobalCart((state) => state.cart);
+    const sessionExpiryDate = GlobalCart((state) => state.sessionExpiryDate);
+    const setSessionExpiryDate = GlobalCart((state) => state.setSessionExpiryDate);
 
     const intervalRef = React.useRef(null);
 
     const getOrders = async () => {
+        if(!orgId || !tableId) {
+            return;
+        }
+
         try {
             const response = await axios.post(
                 'https://accounting-new.inkapps.io/api/shop/getTableDetailsWithOrder',
@@ -83,7 +101,8 @@ function App() {
                 {
                     headers: {
                         'Content-Type': 'application/json',
-                        'hosturl': 'jamee.inkapps.io'
+                        'hosturl': 'jamee.inkapps.io',
+                        'orgid': orgId
                     }
                 });
 
@@ -114,6 +133,10 @@ function App() {
     }
 
     const getProducts = async () => {
+        if(!orgId) {
+            return;
+        }
+
         try {
             const response = await axios.post(
                 'https://accounting-new.inkapps.io/api/shop/getProducts',
@@ -121,7 +144,8 @@ function App() {
                 {
                     headers: {
                         'Content-Type': 'application/json',
-                        'hosturl': 'jamee.inkapps.io'
+                        'hosturl': 'jamee.inkapps.io',
+                        'orgid': orgId
                     }
                 });
             seData(response.data.data);
@@ -148,8 +172,6 @@ function App() {
     }, [tableId]);
 
     useEffect(() => {
-        getProducts();
-
         if (query.get('tableId') && tableId != query.get('tableId')) {
             setTableId(query.get('tableId'));
         }
@@ -158,10 +180,39 @@ function App() {
             setTableName(query.get('tableName'));
         }
 
-        return () => {
-            clearInterval(intervalRef.current);
+        if (query.get('orgId') && orgId != query.get('orgId')) {
+            setOrgId(query.get('orgId'));
         }
+
+        if (sessionExpiryDate) {
+            const interval = setInterval(() => {
+                const now = new Date();
+                const expiryDate = new Date(sessionExpiryDate);
+                if (now >= expiryDate) {
+                    setTableId(null);
+                    setTableName(null);
+                    setOrgId(null);
+                    setSessionExpiryDate(null);
+                    localStorage.removeItem('tableId');
+                    localStorage.removeItem('tableName');
+                    localStorage.removeItem('orgId');
+                    localStorage.removeItem('sessionExpiryDate');
+
+                    window.location.href = '/';
+                }
+            }, 1000);
+            intervalRef.current = interval;
+        } 
     }, []);
+
+    useEffect(() => {
+        const now = new Date();
+        const expiryDate = new Date(now.getTime() + 45 * 60000);
+        setSessionExpiryDate(expiryDate);
+        
+        getProducts();
+    }, [orgId]);
+    
 
     if (tableId) {
         return (
